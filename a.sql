@@ -196,24 +196,24 @@ VALUES ('452 SW Marine Dr, Vancouver, BC', 4, '113');
 INSERT INTO  MovieSchedule(time, roomNum, address, movieID) 
 VALUES (to_timestamp('2023/04/01 09:00', 'YYYY/MM/DD HH24 MI'), 4, '452 SW Marine Dr, Vancouver, BC', '10');
 INSERT INTO  MovieSchedule(time, roomNum, address, movieID) 
-VALUES ('2023-04-01 15:00', 4, '452 SW Marine Dr, Vancouver, BC', '10');
+VALUES (to_timestamp('2023/04/01 15:00', 'YYYY/MM/DD HH24 MI'), 4, '452 SW Marine Dr, Vancouver, BC', '10');
 INSERT INTO  MovieSchedule(time, roomNum, address, movieID) 
-VALUES ('2023-04-10 13:00', 4, '452 SW Marine Dr, Vancouver, BC', '10');
+VALUES (to_timestamp('2023/04/01 13:00', 'YYYY/MM/DD HH24 MI'), 4, '452 SW Marine Dr, Vancouver, BC', '10');
 INSERT INTO  MovieSchedule(time, roomNum, address, movieID) 
-VALUES ('2023-04-14 10:00', 4, '452 SW Marine Dr, Vancouver, BC', '157982');
+VALUES (to_timestamp('2023/04/01 10:00', 'YYYY/MM/DD HH24 MI'), 4, '452 SW Marine Dr, Vancouver, BC', '157982');
 INSERT INTO  MovieSchedule(time, roomNum, address, movieID) 
-VALUES ('2023-04-14 09:00', 1, '1234 West Mall, Vancouver, BC', '10');
+VALUES (to_timestamp('2023/04/01 09:00', 'YYYY/MM/DD HH24 MI'), 1, '1234 West Mall, Vancouver, BC', '10');
 
 INSERT INTO  Ticket(ID, type, seatNum, time, customerID, price, address, roomNum) 
-VALUES ('1452', '3D', 'D15', '2023-04-13 09:00', '1', 19.0, '452 SW Marine Dr, Vancouver, BC', 4);
+VALUES ('1452', '3D', 'D15', to_timestamp('2023/04/01 09:00', 'YYYY/MM/DD HH24 MI'), '1', 19.0, '452 SW Marine Dr, Vancouver, BC', 4);
 INSERT INTO  Ticket(ID, type, seatNum, time, customerID, price, address, roomNum) 
-VALUES ('1453', '3D Luxury', 'A05', '2023-04-13 09:00', '2', 20.0, '1234 West Mall, Vancouver, BC', 1);
+VALUES ('1453', '3D Luxury', 'A05', to_timestamp('2023/04/01 09:00', 'YYYY/MM/DD HH24 MI'), '2', 20.0, '1234 West Mall, Vancouver, BC', 1);
 INSERT INTO  Ticket(ID, type, seatNum, time, customerID, price, address, roomNum) 
-VALUES ('1500', '4DX', 'C05', '2023-04-12 10:00', '4', 25.0, '452 SW Marine Dr, Vancouver, BC', 4);
+VALUES ('1500', '4DX', 'C05', to_timestamp('2023/04/01 10:00', 'YYYY/MM/DD HH24 MI'), '4', 25.0, '452 SW Marine Dr, Vancouver, BC', 4);
 INSERT INTO  Ticket(ID, type, seatNum, time, customerID, price, address, roomNum) 
-VALUES ('173', 'Normal', 'C05', '2023-04-10 13:00', '1', 17.0, '452 SW Marine Dr, Vancouver, BC', 4);
+VALUES ('173', 'Normal', 'C05', to_timestamp('2023/04/01 13:00', 'YYYY/MM/DD HH24 MI'), '1', 17.0, '452 SW Marine Dr, Vancouver, BC', 4);
 INSERT INTO  Ticket(ID, type, seatNum, time, customerID, price, address, roomNum) 
-VALUES ('782', 'Normal', 'D21', '2023-04-15 15:00', '5', 17.0, '452 SW Marine Dr, Vancouver, BC', 4);
+VALUES ('782', 'Normal', 'D21', to_timestamp('2023/04/01 15:00', 'YYYY/MM/DD HH24 MI'), '5', 17.0, '452 SW Marine Dr, Vancouver, BC', 4);
 
 INSERT INTO  ConcessionStand(ID, name, address) 
 VALUES ('12', 'McDonald', '452 SW Marine Dr, Vancouver, BC');
