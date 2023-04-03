@@ -139,15 +139,15 @@ INSERT INTO Customer(ID, name, email, phone, dateOfBirth)
 VALUES ('5', 'Sam Bcde', 'samsam@gmail.com', '1234561234', DATE '2000-01-05');
 
 INSERT INTO  Movie(ID, duration, rating, name) 
-VALUES ('10', 148 , 'PG-13' , 'Spider-Man: No Way Home');
+VALUES ('10', 148 , 'PG13' , 'Spider-Man: No Way Home');
 INSERT INTO  Movie(ID, duration, rating, name) 
-VALUES ('53', 121 , 'PG-13' , 'Spider-Man');
+VALUES ('53', 121 , 'PG13' , 'Spider-Man');
 INSERT INTO  Movie(ID, duration, rating, name) 
 VALUES ('2345', 95 , '18A' , 'Cocaine Bear');
 INSERT INTO  Movie(ID, duration, rating, name) 
 VALUES ('157982', 126 , 'G' , 'The Karate Kid');
 INSERT INTO  Movie(ID, duration, rating, name) 
-VALUES ('113', 125 , 'PG-13' , 'Ant-Man and the Wasp: Quantumania');
+VALUES ('113', 125 , 'PG13' , 'Ant-Man and the Wasp: Quantumania');
 
 INSERT INTO Review(ID, star, commentText, customerID, movieID)
 VALUES ('1', 4.0, 'Great movie', '1', '10');
