@@ -41,7 +41,7 @@
             Rating: <input type="text" name="insRating"> <br /><br />
             Name: <input type="text" name="insName"> <br /><br />
 
-            <input type="submit" value="Insert" name="insertSubmit"></p>
+            <p><input type="submit" value="Insert" name="insertSubmit"></p>
         </form>
 
         <hr />
@@ -54,7 +54,7 @@
             Old Name: <input type="text" name="oldName"> <br /><br />
             New Name: <input type="text" name="newName"> <br /><br />
 
-            <input type="submit" value="Update" name="updateSubmit"></p>
+            <p><input type="submit" value="Update" name="updateSubmit"></p>
         </form>
 
         <hr />
@@ -62,16 +62,71 @@
         <h2>Count the Tuples in Movie</h2>
         <form method="GET" action="project.php"> <!--refresh page when submitted-->
             <input type="hidden" id="countTupleRequest" name="countTupleRequest">
-            <input type="submit" name="countTuples"></p>
+            <p><input type="submit" name="countTuples"></p>
         </form>
+        <?php
+        if (isset($_GET['countTupleRequest'])) {
+            handleGETRequest();
+        }
+        ?>
 
         <hr />
 
         <h2>Display the Tuples in Movie</h2>
         <form method="GET" action="project.php"> <!--refresh page when submitted-->
             <input type="hidden" id="displayTupleRequest" name="displayTupleRequest">
-            <input type="submit" name="displayTuples"></p>
+            <p><input type="submit" name="displayTuples"></p>
         </form>
+        <?php 
+        if (isset($_GET['displayTupleRequest'])) {
+            handleGETRequest();
+        }
+        ?>
+
+        <hr />
+
+        <h2>Movies Shown</h2>
+        <form method="GET" action = "project.php">
+            <input type = "hidden" id = "movieShown" name = "displayMoviesShownRequest">
+            Location:
+            <select id = "locations" name = "locations">
+                <option value = "1234WM">1234 West Mall</option>
+                <option value = "452SW">452 SW Marine Dr</option>
+                <option value = "all">All</option>
+            </select> 
+            <p><input type="submit" value = "Submit" name="displayMoviesShown"></p>
+        </form>
+        <?php 
+        if (isset($_GET['displayMoviesShownRequest'])) {
+            handleGETRequest();
+        }
+        ?>
+
+        <hr />
+
+        <h2>Movies Rating</h2>
+        <form method="GET" action = "project.php">
+            <input type = "hidden" id = "movieShown" name = "displayMoviesRatingRequest">
+            <p><input type="submit" value = "Submit" name="displayMoviesRating"></p>
+        </form>
+        <?php 
+        if (isset($_GET['displayMoviesRatingRequest'])) {
+            handleGETRequest();
+        }
+        ?>
+
+        <hr /> 
+        <h2>Sales by Location</h2>
+        <form method="GET" action = "project.php">
+            <input type = "hidden" id = "movieShown" name = "displaySalesRequest">
+            <p><input type="submit" value = "Submit" name="displaySales"></p>
+        </form>
+        <?php 
+        if (isset($_GET['displaySalesRequest'])) {
+            handleGETRequest();
+        }
+        ?>
+        
 
         <?php
 		//this tells the system that it's no longer just parsing html; it's now parsing PHP
@@ -168,7 +223,7 @@
 
             // Your username is ora_(CWL_ID) and the password is a(student number). For example,
 			// ora_platypus is the username and a12345678 is the password.
-            $db_conn = OCILogon("ora_seanquan", "a43496900", "dbhost.students.cs.ubc.ca:1522/stu");
+            $db_conn = OCILogon("ora_yuhei616", "a36561967", "dbhost.students.cs.ubc.ca:1522/stu");
 
             if ($db_conn) {
                 debugAlertMessage("Database is Connected");
@@ -206,7 +261,7 @@
 
             // Create new table
             echo "<br> creating new table <br>";
-            executePlainSQL("CREATE TABLE Movie (ID varchar(20) PRIMARY KEY, duration integer NOT NULL, rating varchar(10), name varchar(50) NOT NULL)");
+            executePlainSQL("CREATE TABLE Movie (ID	VARCHAR(20) PRIMARY KEY, duration INTEGER NOT NULL, rating	VARCHAR(10), name VARCHAR(50) NOT NULL)");
             OCICommit($db_conn);
         }
 
@@ -246,6 +301,86 @@
             printResult($result);
         }
 
+        function handleMovieShownRequest() {
+            global $db_conn;
+
+            if ($_GET['locations'] == '1234WM') {
+                $result = executePlainSQL(
+                    "SELECT DISTINCT m.name, m.duration 
+                    FROM Movie m, Shows s 
+                    WHERE m.ID = s.movieID AND s.address = '1234 West Mall, Vancouver, BC'"
+                );
+            } else if ($_GET['locations'] == '452SW') {
+                $result = executePlainSQL(
+                    "SELECT DISTINCT m.name, m.duration 
+                    FROM Movie m, Shows s 
+                    WHERE m.ID = s.movieID AND s.address = '452 SW Marine Dr, Vancouver, BC'"
+                );
+            } else {
+                $result = executePlainSQL(
+                    "SELECT DISTINCT m.name, m.duration 
+                    FROM Movie m, Shows s 
+                    WHERE m.ID = s.movieID"
+                );
+            }
+
+            echo "<table>";
+            echo "<tr><th>Name</th><th>Duration (min)</th>";
+
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                // echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["duration"] . "</td><td>" . $row["Rating"] . "</td><td>" . $row["Name"] . "</td></tr>"; //or just use "echo $row[0]"
+                // echo "<tr><td" . $row["ID"]
+                // echo $row[0];
+                echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["DURATION"] . "</td></tr>";
+            }
+
+            echo "</table>";
+        }
+
+        function handleMovieRatingRequest() {
+            global $db_conn;
+
+            $result = executePlainSQL(
+                "SELECT m.name, AVG(r.star) as rating 
+                FROM Review r, Movie m
+                WHERE r.movieID = m.ID
+                GROUP BY m.name
+                HAVING COUNT(*) > 1");
+
+            echo "<table>";
+            echo "<tr><th>Movie</th><th>Rating</th>";
+
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                // echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["duration"] . "</td><td>" . $row["Rating"] . "</td><td>" . $row["Name"] . "</td></tr>"; //or just use "echo $row[0]"
+                // echo "<tr><td" . $row["ID"]
+                // echo $row[0];
+                echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["RATING"] . "</td></tr>";
+            }
+
+            echo "</table>";
+        }
+
+        function handleDisplaySalesRequest() {
+            global $db_conn;
+
+            $result = executePlainSQL(
+                "SELECT t.address, SUM(t.price) as sales 
+                FROM Ticket t
+                GROUP BY t.address");
+
+            echo "<table>";
+            echo "<tr><th>Theatre</th><th>Total Sales</th>";
+
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                // echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["duration"] . "</td><td>" . $row["Rating"] . "</td><td>" . $row["Name"] . "</td></tr>"; //or just use "echo $row[0]"
+                // echo "<tr><td" . $row["ID"]
+                // echo $row[0];
+                echo "<tr><td>" . $row["ADDRESS"] . "</td><td>" . $row["SALES"] . "</td></tr>";
+            }
+
+            echo "</table>";
+        }
+
         // HANDLE ALL POST ROUTES
 	// A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
         function handlePOSTRequest() {
@@ -272,18 +407,24 @@
                 else if (array_key_exists('displayTuples', $_GET)) {
                     handleDisplayRequest();
                 }
+                else if (array_key_exists('displayMoviesShown', $_GET)) {
+                    handleMovieShownRequest();
+                } 
+                else if (array_key_exists('displayMoviesRating', $_GET)) {
+                    handleMovieRatingRequest();
+                }
+                else if (array_key_exists('displaySales', $_GET)) {
+                    handleDisplaySalesRequest();
+                }
 
                 disconnectFromDB();
             }
         }
 
-		if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit'])) {
+        if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit'])) {
             handlePOSTRequest();
-        } else if (isset($_GET['countTupleRequest'])) {
-            handleGETRequest();
-        } else if (isset($_GET['displayTupleRequest'])) {
-            handleGETRequest();
         }
+    
 		?>
 	</body>
 </html>
