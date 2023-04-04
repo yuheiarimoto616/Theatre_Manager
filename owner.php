@@ -218,7 +218,7 @@
 
             // Your username is ora_(CWL_ID) and the password is a(student number). For example,
             // ora_platypus is the username and a12345678 is the password.
-            $db_conn = OCILogon("ora_yuhei616", "a36561967", "dbhost.students.cs.ubc.ca:1522/stu");
+            $db_conn = OCILogon("ora_seanquan", "a43496900", "dbhost.students.cs.ubc.ca:1522/stu");
 
 
             if ($db_conn) {
@@ -366,6 +366,8 @@
         }
 
 		function handlePOSTRequest() {
+            global $success;
+
 			if (connectToDB()) {
 				if (array_key_exists('resetTablesRequest', $_POST)) {
 					handleResetRequest();
@@ -375,6 +377,12 @@
 					handleInsertRequest();
 				}
 
+                if ($success) {
+                    echo '<script>alert("POST success")</script>';
+                }
+                else {
+                    echo '<script>alert("POST failed")</script>';
+                }
 
 				disconnectFromDB();
 			}
