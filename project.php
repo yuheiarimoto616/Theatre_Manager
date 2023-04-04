@@ -1,27 +1,6 @@
-<!--Test Oracle file for UBC CPSC304 2018 Winter Term 1
-  Created by Jiemin Zhang
-  Modified by Simona Radu
-  Modified by Jessica Wong (2018-06-22)
-  This file shows the very basics of how to execute PHP commands
-  on Oracle.
-  Specifically, it will drop a table, create a table, insert values
-  update values, and then query for values
-
-
-  IF YOU HAVE A TABLE CALLED "Movie" IT WILL BE DESTROYED
-
-
-  The script assumes you already have a server set up
-  All OCI commands are commands to the Oracle libraries
-  To get the file to work, you must place it somewhere where your
-  Apache server can run it, and you must rename it to have a ".php"
-  extension.  You must also change the username and password on the
-  OCILogon below to be your ORACLE username and password -->
-
-
-  <html>
-    <head>
-        <title>Movie Theatre</title>
+<html>
+	<head>
+        <title>Movie Theatre Manager</title>
         <style>
             table, th, td {
                 border: 1px solid black;
@@ -29,115 +8,141 @@
         </style>
     </head>
 
+	<body>
+		<button onclick = "document.location = 'project.php'">Customer</button>
+		<button onclick = "document.location = 'owner.php'">Manage Theatre</button>
+		<h2>Reset</h2>
+        <p>If you wish to reset the table press on the reset button. If this is the first time you're running this page, you MUST use reset</p>
 
-    <body>
-        <button onclick = "document.location = 'project.php'">Customer</button>
-        <button onclick = "document.location = 'owner.php'">Manage Theatre</button>
+		<form method="POST" action="owner.php">
+			<!-- if you want another page to load after the button is clicked, you have to specify that page in the action parameter -->
+			<input type="hidden" id="resetTablesRequest" name="resetTablesRequest">
+			<p><input type="submit" value="Reset" name="reset"></p>
+		</form>
 
-        <h2>Personal Information</h2>
-        <form method="GET" action="project.php">
-        <input type="hidden" id="updateQueryRequest" name="showInfoRequest">
-        Your ID: <input type="text" name="id"> <br /><br />
-        <p><input type="submit" value="Show" name="showInfo"></p>
-        </form>
-        <?php
-        if (isset($_GET['showInfoRequest'])) {
-            handleGETRequest();
-        }
-        ?>   
+		<hr />
 
-        <h2>{UPDATE} Update Personal Information</h2>
-        <p>Put your ID to update your personal info. Leave the field empty for unchanged information.</p>
-
-        <form method="POST" action="project.php"> <!--refresh page when submitted-->
-            <input type="hidden" id="updateQueryRequest" name="updateQueryRequest">
-            Your ID: <input type="text" name="updateID"> <br /><br />
-            Update Name: <input type="text" name="updateName"> <br /><br />
-            Update Email: <input type="text" name="updateEmail"> <br /><br />
-            Update Phone: <input type="text" name="updatePhone"> <br /><br />
-            Update Birthday: <input type="date" name="updateDOB"> <br /><br />
-
-            <p><input type="submit" value="Update" name="updateSubmit"></p>
-        </form>
-
-        <hr />
-
-        <h2>Movies Rating</h2>
-        <form method="GET" action = "project.php">
-            <input type = "hidden" id = "movieShown" name = "displayMoviesRatingRequest">
-            <p><input type="submit" value = "Submit" name="displayMoviesRating"></p>
-        </form>
-        <?php
-        if (isset($_GET['displayMoviesRatingRequest'])) {
-            handleGETRequest();
-        }
-        ?>      
-       
-        <hr />
-
-        <h2>Movies Shown</h2>
-        <form method="GET" action = "project.php">
-            <input type = "hidden" id = "movieShown" name = "displayMoviesShownRequest">
+		<h2>{INSERTION} Add Room</h2>
+        <form method="POST" action="owner.php"> <!--refresh page when submitted-->
+            <input type="hidden" id="insertQueryRequest" name="insertQueryRequest">
+            Room Number: <input type="text" name="insRoomNum"> <br /><br />
             Location:
-            <select id = "locations" name = "locations">
+            <select id = "theatres" name = "theatres">
                 <?php
                 if (connectToDB()) {
                     global $db_conn;
-                    $result = executePlainSQL("SELECT DISTINCT address FROM Shows");
+                    $result = executePlainSQL("SELECT address FROM Theatre");
                     while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
                 ?>
                         <option value = "<?php echo $row["ADDRESS"]; ?>">
                         <?php echo $row["ADDRESS"];?>
                         </option>
                 <?php }}?>
-                <!-- <option value = "1234WM">1234 West Mall</option>
-                <option value = "452SW">452 SW Marine Dr</option>
-                 -->
-                <option value = "all">All</option>
-            </select>
-            <p><input type="submit" value = "Submit" name="displayMoviesShown"></p>
+            </select> 
+            <br /><br />
+            Capacity: <input type="text" name="insCapacity"> <br /><br />
+
+
+            <p><input type="submit" value="Insert" name="insertSubmit"></p>
         </form>
-        <?php
-        if (isset($_GET['displayMoviesShownRequest'])) {
+
+
+        <hr />
+
+		<!-- <h2>Count the Tuples in Movie</h2>
+        <form method="GET" action="owner.php">
+            <input type="hidden" id="countTupleRequest" name="countTupleRequest">
+            <p><input type="submit" name="countTuples"></p>
+        </form>
+        ?php
+        if (isset($_GET['countTupleRequest'])) {
             handleGETRequest();
         }
         ?>
 
 
-        <hr />
-        <h2>{SELECTION} Select movies based on rating</h2>
-        <form method="GET" action = "project.php">
-            <input type = "hidden" id = "moviesSelect" name = "displayMoviesSelectRequest">
-            Rating:
-            <select id = "ratings" name = "ratings">
+        <hr /> -->
+
+		<h2>Display the Tuples in Movie</h2>
+        <form method="GET" action="owner.php"> <!--refresh page when submitted-->
+            <input type="hidden" id="displayTupleRequest" name="displayTupleRequest">
+            Table:
+            <select id = "tables" name = "tables">
                 <?php
                 if (connectToDB()) {
                     global $db_conn;
-                    $result = executePlainSQL("SELECT DISTINCT rating FROM Movie");
+                    $result = executePlainSQL("SELECT table_name FROM user_tables");
                     while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
                 ?>
-                        <option value = "<?php echo $row["RATING"]; ?>">
-                        <?php echo $row["RATING"];?>
+                        <option value = "<?php echo $row["TABLE_NAME"]; ?>">
+                        <?php echo $row["TABLE_NAME"];?>
                         </option>
                 <?php }}?>
-                <option value = "all">All</option>
             </select>
-            <p><input type="submit" value = "Submit" name="displayMoviesSelect"></p>
+            <p><input type="submit" name="displayTuples"></p>
         </form>
         <?php
-        if (isset($_GET['displayMoviesSelectRequest'])) {
+        if (isset($_GET['displayTupleRequest'])) {
+            handleGETRequest();
+        }
+        ?>
+
+		<hr />
+
+		<h2>Sales by Location</h2>
+        <form method="GET" action = "owner.php">
+            <input type = "hidden" id = "movieShown" name = "displaySalesRequest">
+            <p><input type="submit" value = "Submit" name="displaySales"></p>
+        </form>
+        <?php
+        if (isset($_GET['displaySalesRequest'])) {
             handleGETRequest();
         }
         ?>
 
         <hr />
 
-
+        <h2>{DIVISION} Finding customers who have eaten all types of food offered</h2>
+        <form method="GET" action = "owner.php">
+            <input type = "hidden" id = "movieShown" name = "displayDivisionRequest">
+            <p><input type="submit" value = "Submit" name="displayDivision"></p>
+        </form>
         <?php
-        //this tells the system that it's no longer just parsing html; it's now parsing PHP
+        if (isset($_GET['displayDivisionRequest'])) {
+            handleGETRequest();
+        }
+        ?>
 
+		<hr />
 
-        $success = True; //keep track of errors so it redirects the page only if there are no errors
+        <h2>{DELETE} Delete theatre (which cascades rooms)</h2>
+        <form method="GET" action = "owner.php">
+            <input type = "hidden" id = "theatreDelete" name = "theatreDeleteRequest">
+            Theatre address:
+            <select id = "theatres" name = "theatres">
+                <?php
+                if (connectToDB()) {
+                    global $db_conn;
+                    $result = executePlainSQL("SELECT address FROM Theatre");
+                    while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                ?>
+                        <option value = "<?php echo $row["ADDRESS"]; ?>">
+                        <?php echo $row["ADDRESS"];?>
+                        </option>
+                <?php }}?>
+            </select>
+            <p><input type="submit" value = "Submit" name="theatreDelete"></p>
+        </form>
+        <?php
+        if (isset($_GET['theatreDeleteRequest'])) {
+            handleGETRequest();
+        }
+        ?>
+
+		<hr />
+
+		<?php
+		$success = True; //keep track of errors so it redirects the page only if there are no errors
         $db_conn = NULL; // edit the login credentials in connectToDB()
         $show_debug_alert_messages = False; // set to True if you want alerts to show you which methods are being triggered (see how it is used in debugAlertMessage())
 
@@ -151,8 +156,7 @@
             }
         }
 
-
-        function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
+		function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
             //echo "<br>running ".$cmdstr."<br>";
             global $db_conn, $success;
 
@@ -164,7 +168,9 @@
             if (!$statement) {
                 echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
                 $e = OCI_Error($db_conn); // For OCIParse errors pass the connection handle
-                echo htmlentities($e['message']);
+                $errorMessage = $e['message'];
+                echo htmlentities($errorMessage);  //error message
+                echo '<script>alert("'.$errorMessage.'")</script>';
                 $success = False;
             }
 
@@ -172,12 +178,10 @@
             $r = OCIExecute($statement, OCI_DEFAULT);
             if (!$r) {
                 echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
-                $e = OCI_Error($statement); // For OCIExecute errors, pass the statementhandle
-                echo htmlentities($e['message']);  //error message
+                $e = oci_error($statement); // For OCIExecute errors pass the statementhandle
                 $errorMessage = $e['message'];
-                echo '<script>alert(' . $errorMessage . ')</script>';
-                echo '<script>alert("Invalid input!  Error: ' . $errorMessage . '")</script>';
-                echo "<br>";
+                echo htmlentities($errorMessage);  //error message
+                echo '<script>alert("'.$errorMessage.'")</script>';
                 $success = False;
             }
 
@@ -200,7 +204,9 @@
             if (!$statement) {
                 echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
                 $e = OCI_Error($db_conn);
-                echo htmlentities($e['message']);
+                $errorMessage = $e['message'];
+                echo htmlentities($errorMessage);  //error message
+                echo '<script>alert("'.$errorMessage.'")</script>';
                 $success = False;
             }
 
@@ -218,18 +224,21 @@
                 if (!$r) {
                     echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
                     $e = OCI_Error($statement); // For OCIExecute errors, pass the statementhandle
-                    echo htmlentities($e['message']);  //error message
-                    $errorMessage = "Value too large.";
-                    echo '<script>alert("Invalid input!  Error: ' . $errorMessage . '")</script>';
+                    $errorMessage = $e['message'];
+                    echo htmlentities($errorMessage);  //error message
+
+                    $needle = "unique";
+                    if (str_contains($errorMessage, $needle)) {
+                        echo '<script>alert("Tuple already exists in table!")</script>';
+                    }
+                    echo '<script>alert("'.$errorMessage.'")</script>';
                     echo "<br>";
                     $success = False;
                 }
             }
-
-            return $statement;
         }
 
-        function connectToDB() {
+		function connectToDB() {
             global $db_conn;
 
 
@@ -258,208 +267,164 @@
             OCILogoff($db_conn);
         }
 
-        function showInfo() {
+		function printResult($result) { //prints results from a select statement
             global $db_conn;
-
-            $tuple = array (
-                ":bind1" => $_GET['id']
-            );
-
-            $alltuples = array (
-                $tuple
-            );
-
-			$result = executeBoundSQL("SELECT * FROM Customer WHERE ID=:bind1", $alltuples);
-
             echo "<table>";
-            echo "<tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Birthday</th></tr>";
-            while ($row = OCI_Fetch_Array($result)) {
-                echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["NAME"] . "</td><td>" . $row["EMAIL"] . "</td><td>" . $row["PHONE"] . "</td><td>" . $row["DATEOFBIRTH"] . "</td></tr>";
+            $table = $_GET['tables'];
+            $cols =  executePlainSQL("SELECT DISTINCT column_name from USER_TAB_COLS WHERE table_name='$table'");
+            echo "<tr>";
+            while ($colsArray =  OCI_Fetch_Array($cols, OCI_BOTH)) {
+                echo "<th>" . $colsArray["COLUMN_NAME"] . "</th>";
             }
-            echo "</table>";
-        }
-
-        function handleUpdateRequest() {
-            global $db_conn, $success;
- 
-            $newName = $_POST['updateName'];
-            $newEmail = $_POST['updateEmail'];
-            $newPhone = $_POST['updatePhone'];
-            $newDOB = $_POST['updateDOB'];
-
-			if ($_POST['updateID'] == "") {
-                echo '<script>alert("Need ID to update!")</script>';
-                $success = False;
-            }
-            else {
-                //case where ID does not exist
-                $result = executePlainSQL("SELECT * FROM Customer WHERE ID ='" . $_POST['updateID'] . "'");
-                $row = oci_fetch_row($result);
-                $rowExist = $row[0];
-                
-                if ($rowExist == "") {
-                    echo '<script>alert("ID is not valid!")</script>';
-                    $success = False;
-                }
-            }
-            
-
-
-
-
-            if ($_POST['updateName'] == "") {
-                $result = executePlainSQL("SELECT name FROM Customer WHERE ID ='" . $_POST['updateID'] . "'");
-                $row = oci_fetch_row($result);
-                $newName = $row[0];
-            }
-            if ($_POST['updateEmail'] == "") {
-                $result = executePlainSQL("SELECT email FROM Customer WHERE ID ='" . $_POST['updateID'] . "'");
-                $row = oci_fetch_row($result);
-                $newEmail = $row[0];
-            }
-            if ($_POST['updatePhone'] == "") {
-                $result = executePlainSQL("SELECT phone FROM Customer WHERE ID ='" . $_POST['updateID'] . "'");
-                $row = oci_fetch_row($result);
-                $newPhone = $row[0];
-            }
-            if ($_POST['updateDOB'] == "") {
-                $result = executePlainSQL("SELECT dateOfBirth FROM Customer WHERE ID ='" . $_POST['updateID'] . "'");
-                $row = oci_fetch_row($result);
-                $newDOB = $row[0];
-            }
-
-            // $date = new DateTime($newDOB);
-            // $newDOB = $date->format('Y-m-d H:i:s');
-
-            $tuple = array (
-                ":bind1" => $_POST['updateID'],
-                ":bind2" => $newName,
-                ":bind3" => $newEmail,
-                ":bind4" => $newPhone,
-                ":bind5" => $newDOB,
-            );
-
-            $alltuples = array (
-                $tuple
-            );
-
-
-            if ($_POST['updateDOB'] == "") {
-                executeBoundSQL(
-                    "UPDATE Customer 
-                    SET ID =:bind1, name=:bind2, email=:bind3, phone=:bind4, dateOfBirth=:bind5
-                    WHERE ID=:bind1"
-                    , $alltuples
-                );
-            }
-            else {
-                executeBoundSQL(
-                    "UPDATE Customer 
-                    SET ID =:bind1, name=:bind2, email=:bind3, phone=:bind4, dateOfBirth=DATE'$newDOB'
-                    WHERE ID=:bind1"
-                    , $alltuples
-                );
-            }
-            OCICommit($db_conn);
-        }
-
-        function handleMovieShownRequest() {
-            global $db_conn;
-
-            $location = $_GET['locations'];
-            if ($location == 'all') {
-                $result = executePlainSQL(
-                    "SELECT DISTINCT m.name, m.duration
-                    FROM Movie m, Shows s
-                    WHERE m.ID = s.movieID"
-                );
-            } else {
-                $result = executePlainSQL(
-                    "SELECT DISTINCT m.name, m.duration
-                    FROM Movie m, Shows s
-                    WHERE m.ID = s.movieID AND s.address = '$location'"
-                );
-            }
-
-            echo "<table>";
-            echo "<tr><th>Name</th><th>Duration (min)</th>";
-
+            echo "</tr>";
 
             while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
                 // echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["duration"] . "</td><td>" . $row["Rating"] . "</td><td>" . $row["Name"] . "</td></tr>"; //or just use "echo $row[0]"
                 // echo "<tr><td" . $row["ID"]
                 // echo $row[0];
-                echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["DURATION"] . "</td></tr>";
+                echo "<tr>";
+                $table = $_GET['tables'];
+                $cols =  executePlainSQL("SELECT DISTINCT column_name from USER_TAB_COLS WHERE table_name='$table'");
+                while ($colsArray =  OCI_Fetch_Array($cols, OCI_BOTH)) {
+                    $colName = $colsArray["COLUMN_NAME"];
+                    echo  "<td>" . $row[$colName] . "</td>";
+                }
+                echo "</tr>";
             }
-
 
             echo "</table>";
         }
 
+		function handleInsertRequest() {
+            global $db_conn, $success;
 
-        //SEAN
-        function handleDisplayMoviesSelectRequest() {
+
+            //Getting the values from user and insert data into the table
+            $tuple = array (
+                ":bind1" => $_POST['insRoomNum'],
+                ":bind2" => $_POST['theatres'],
+                ":bind3" => $_POST['insCapacity']
+            );
+
+
+            $alltuples = array (
+                $tuple
+            );
+
+            if ($_POST['insRoomNum'] == "") {
+                echo '<script>alert("RoomNum cannot be empty!")</script>';
+            }
+
+            executeBoundSQL("insert into Room values (:bind1, :bind2, :bind3)", $alltuples);
+            OCICommit($db_conn);
+        }
+
+		function handleCountRequest() {
             global $db_conn;
 
-            $rating = $_GET['ratings'];
 
-            if ($rating == 'all') {
-                $result = executePlainSQL(
-                    "SELECT * FROM Movie"
-                );
-            } else {
-                $result = executePlainSQL(
-                    "SELECT *
-                    FROM Movie
-                    WHERE rating = '$rating'"
-                );
-            }
+            $result = executePlainSQL("SELECT Count(*) FROM Movie");
 
-            echo "<table>";
-            echo "<tr><th>ID</th><th>Name</th><th>Duration</th><th>Rating</th></tr>";
-            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-                echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["NAME"] . "</td><td>" . $row["DURATION"] . "</td><td>" . $row["RATING"] . "</td></tr>";
+
+            if (($row = oci_fetch_row($result)) != false) {
+                echo "<br> The number of tuples in Movie: " . $row[0] . "<br>";
             }
-            echo "</table>";
         }
 
+		function handleResetRequest() {
+			global $db_conn;
+			// Drop old table
+			executePlainSQL("DROP TABLE Movie");
 
-        function handleMovieRatingRequest() {
+
+			// Create new table
+			echo "<br> creating new table <br>";
+			executePlainSQL("CREATE TABLE Movie (ID VARCHAR(20) PRIMARY KEY, duration INTEGER NOT NULL, rating  VARCHAR(10), name VARCHAR(50) NOT NULL)");
+			OCICommit($db_conn);
+		}
+
+		function handleDisplayRequest() {
+            global $db_conn;
+
+            $table = $_GET['tables'];
+
+            $result = executePlainSQL("SELECT * FROM $table");
+            printResult($result);
+        }
+
+		function handleDisplaySalesRequest() {
             global $db_conn;
 
 
             $result = executePlainSQL(
-                "SELECT m.name, AVG(r.star) as rating
-                FROM Review r, Movie m
-                WHERE r.movieID = m.ID
-                GROUP BY m.name
-                HAVING COUNT(*) > 1");
+                "SELECT t.address, SUM(t.price) as sales
+                FROM Ticket t
+                GROUP BY t.address");
 
 
             echo "<table>";
-            echo "<tr><th>Movie</th><th>Rating</th>";
+            echo "<tr><th>Theatre</th><th>Total Sales</th>";
 
 
             while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
                 // echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["duration"] . "</td><td>" . $row["Rating"] . "</td><td>" . $row["Name"] . "</td></tr>"; //or just use "echo $row[0]"
                 // echo "<tr><td" . $row["ID"]
                 // echo $row[0];
-                echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["RATING"] . "</td></tr>";
+                echo "<tr><td>" . $row["ADDRESS"] . "</td><td>" . $row["SALES"] . "</td></tr>";
             }
 
 
             echo "</table>";
         }
 
+        function handleDisplayDivisionRequest() {
+            global $db_conn;
 
-        // HANDLE ALL POST ROUTES
-    // A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
-        function handlePOSTRequest() {
+
+            $result = executePlainSQL("SELECT * FROM Customer C WHERE NOT EXISTS 
+                ((SELECT F.ID FROM FoodStuff F) MINUS 
+                (SELECT E.foodStuffID FROM Eats E WHERE E.customerID = C.ID))");
+
+            echo "<table>";
+            echo "<tr><th>ID</th><th>Name</th>";
+
+
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["NAME"] . "</td></tr>";
+            }
+
+
+            echo "</table>";
+        }
+
+        function handleTheatreDeleteRequest() {
+            global $db_conn;
+
+            $tuple = array (
+                ":bind1" => $_GET['theatres']
+            );
+
+
+            $alltuples = array (
+                $tuple
+            );
+
+
+            executeBoundSQL("DELETE FROM Theatre WHERE address = :bind1", $alltuples);
+            OCICommit($db_conn);
+        }
+
+		function handlePOSTRequest() {
             global $success;
-            if (connectToDB()) {
-                 if (array_key_exists('updateQueryRequest', $_POST)) {
-                    handleUpdateRequest();
-                } 
+
+			if (connectToDB()) {
+				if (array_key_exists('resetTablesRequest', $_POST)) {
+					handleResetRequest();
+				} else if (array_key_exists('updateQueryRequest', $_POST)) {
+					handleUpdateRequest();
+				} else if (array_key_exists('insertQueryRequest', $_POST)) {
+					handleInsertRequest();
+				}
 
                 if ($success) {
                     echo '<script>alert("POST success")</script>';
@@ -468,26 +433,26 @@
                     echo '<script>alert("POST failed")</script>';
                 }
 
-                disconnectFromDB();
-            }
-        }
+				disconnectFromDB();
+			}
+		}
 
-
-        // HANDLE ALL GET ROUTES
-    // A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
-        function handleGETRequest() {
+		function handleGETRequest() {
             if (connectToDB()) {
-                if (array_key_exists('displayMoviesShown', $_GET)) {
-                    handleMovieShownRequest();
+                if (array_key_exists('countTuples', $_GET)) {
+                    handleCountRequest();
                 }
-                else if (array_key_exists('displayMoviesRating', $_GET)) {
-                    handleMovieRatingRequest();
+                else if (array_key_exists('displayTuples', $_GET)) {
+                    handleDisplayRequest();
                 }
-                else if (array_key_exists('displayMoviesSelect', $_GET)) {
-                    handleDisplayMoviesSelectRequest();
-                } 
-                else if (array_key_exists('showInfo', $_GET)) {
-                    showInfo();
+                else if (array_key_exists('displaySales', $_GET)) {
+                    handleDisplaySalesRequest();
+                }
+                else if (array_key_exists('displayDivision', $_GET)) {
+                    handleDisplayDivisionRequest();
+                }
+                else if (array_key_exists('theatreDelete', $_GET)) {
+                    handleTheatreDeleteRequest();
                 }
 
 
@@ -495,11 +460,9 @@
             }
         }
 
-
-        if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit'])) {
-            handlePOSTRequest();
-        }
-   
-        ?>
-    </body>
+		if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit'])) {
+			handlePOSTRequest();
+		} 
+		?>
+	</body>
 </html>
