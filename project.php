@@ -312,19 +312,31 @@
                 ":bind1" => $_POST['updateID'],
                 ":bind2" => $newName,
                 ":bind3" => $newEmail,
-                ":bind4" => $newPhone
+                ":bind4" => $newPhone,
+                ":bind5" => $newDOB,
             );
 
             $alltuples = array (
                 $tuple
             );
 
-			executeBoundSQL(
-                "UPDATE Customer 
-                SET ID =:bind1, name=:bind2, email=:bind3, phone=:bind4, dateOfBirth=DATE'$newDOB'
-                WHERE ID=:bind1"
-                , $alltuples
-            );
+
+            if ($_POST['updateDOB'] == "") {
+                executeBoundSQL(
+                    "UPDATE Customer 
+                    SET ID =:bind1, name=:bind2, email=:bind3, phone=:bind4, dateOfBirth=:bind5
+                    WHERE ID=:bind1"
+                    , $alltuples
+                );
+            }
+            else {
+                executeBoundSQL(
+                    "UPDATE Customer 
+                    SET ID =:bind1, name=:bind2, email=:bind3, phone=:bind4, dateOfBirth=DATE'$newDOB'
+                    WHERE ID=:bind1"
+                    , $alltuples
+                );
+            }
             OCICommit($db_conn);
         }
 
