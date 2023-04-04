@@ -172,8 +172,12 @@
             $r = OCIExecute($statement, OCI_DEFAULT);
             if (!$r) {
                 echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
-                $e = oci_error($statement); // For OCIExecute errors pass the statementhandle
-                echo htmlentities($e['message']);
+                $e = OCI_Error($statement); // For OCIExecute errors, pass the statementhandle
+                echo htmlentities($e['message']);  //error message
+                $errorMessage = $e['message'];
+                echo '<script>alert(' . $errorMessage . ')</script>';
+                echo '<script>alert("Invalid input!  Error: ' . $errorMessage . '")</script>';
+                echo "<br>";
                 $success = False;
             }
 
@@ -214,7 +218,9 @@
                 if (!$r) {
                     echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
                     $e = OCI_Error($statement); // For OCIExecute errors, pass the statementhandle
-                    echo htmlentities($e['message']);
+                    echo htmlentities($e['message']);  //error message
+                    $errorMessage = "Value too large.";
+                    echo '<script>alert("Invalid input!  Error: ' . $errorMessage . '")</script>';
                     echo "<br>";
                     $success = False;
                 }
@@ -274,7 +280,7 @@
         }
 
         function handleUpdateRequest() {
-            global $db_conn;
+            global $db_conn, $success;
  
             $newName = $_POST['updateName'];
             $newEmail = $_POST['updateEmail'];
@@ -282,8 +288,25 @@
             $newDOB = $_POST['updateDOB'];
 
 			if ($_POST['updateID'] == "") {
-                echo '<script>alert("Need ID to update")</script>';
+                echo '<script>alert("Need ID to update!")</script>';
+                $success = False;
             }
+            else {
+                //case where ID does not exist
+                $result = executePlainSQL("SELECT * FROM Customer WHERE ID ='" . $_POST['updateID'] . "'");
+                $row = oci_fetch_row($result);
+                $rowExist = $row[0];
+                
+                if ($rowExist == "") {
+                    echo '<script>alert("ID is not valid!")</script>';
+                    $success = False;
+                }
+            }
+            
+
+
+
+
             if ($_POST['updateName'] == "") {
                 $result = executePlainSQL("SELECT name FROM Customer WHERE ID ='" . $_POST['updateID'] . "'");
                 $row = oci_fetch_row($result);
