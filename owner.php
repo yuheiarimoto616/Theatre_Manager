@@ -100,6 +100,19 @@
         }
         ?>
 
+        <hr />
+
+        <h2>{DIVISION} Finding customers who have eaten all types of food offered</h2>
+        <form method="GET" action = "owner.php">
+            <input type = "hidden" id = "movieShown" name = "displayDivisionRequest">
+            <p><input type="submit" value = "Submit" name="displayDivision"></p>
+        </form>
+        <?php
+        if (isset($_GET['displayDivisionRequest'])) {
+            handleGETRequest();
+        }
+        ?>
+
 		<hr />
 
         <h2>{DELETE} Delete theatre (which cascades rooms)</h2>
@@ -364,6 +377,26 @@
             echo "</table>";
         }
 
+        function handleDisplayDivisionRequest() {
+            global $db_conn;
+
+
+            $result = executePlainSQL("SELECT * FROM Customer C WHERE NOT EXISTS 
+                ((SELECT F.ID FROM FoodStuff F) MINUS 
+                (SELECT E.foodStuffID FROM Eats E WHERE E.customerID = C.ID))");
+
+            echo "<table>";
+            echo "<tr><th>ID</th><th>Name</th>";
+
+
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["NAME"] . "</td></tr>";
+            }
+
+
+            echo "</table>";
+        }
+
         function handleTheatreDeleteRequest() {
             global $db_conn;
 
@@ -414,6 +447,9 @@
                 }
                 else if (array_key_exists('displaySales', $_GET)) {
                     handleDisplaySalesRequest();
+                }
+                else if (array_key_exists('displayDivision', $_GET)) {
+                    handleDisplayDivisionRequest();
                 }
                 else if (array_key_exists('theatreDelete', $_GET)) {
                     handleTheatreDeleteRequest();
