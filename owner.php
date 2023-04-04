@@ -22,33 +22,28 @@
 
 		<hr />
 
-		<h2>{INSERTION} Insert Values into Movie</h2>
+		<h2>{INSERTION} Add Room</h2>
         <form method="POST" action="owner.php"> <!--refresh page when submitted-->
             <input type="hidden" id="insertQueryRequest" name="insertQueryRequest">
-            ID: <input type="text" name="insID"> <br /><br />
-            Duration: <input type="text" name="insDuration"> <br /><br />
-            Rating: <input type="text" name="insRating"> <br /><br />
-            Name: <input type="text" name="insName"> <br /><br />
+            Room Number: <input type="text" name="insRoomNum"> <br /><br />
+            Location:
+            <select id = "theatres" name = "theatres">
+                <?php
+                if (connectToDB()) {
+                    global $db_conn;
+                    $result = executePlainSQL("SELECT address FROM Theatre");
+                    while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                ?>
+                        <option value = "<?php echo $row["ADDRESS"]; ?>">
+                        <?php echo $row["ADDRESS"];?>
+                        </option>
+                <?php }}?>
+            </select> 
+            <br /><br />
+            Capacity: <input type="text" name="insCapacity"> <br /><br />
 
 
             <p><input type="submit" value="Insert" name="insertSubmit"></p>
-        </form>
-
-
-        <hr />
-
-		<h2>{UPDATE} Update Name in Movie</h2>
-        <p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
-
-
-        <form method="POST" action="owner.php"> <!--refresh page when submitted-->
-            <input type="hidden" id="updateQueryRequest" name="updateQueryRequest">
-            ID to change: <input type="text" name="updateID"> <br /><br />
-            New Duration: <input type="text" name="updateDuration"> <br /><br />
-            New Rating: <input type="text" name="updateRating"> <br /><br />
-            New Name: <input type="text" name="updateName"> <br /><br />
-
-            <p><input type="submit" value="Update" name="updateSubmit"></p>
         </form>
 
 
@@ -274,63 +269,15 @@
             echo "</table>";
         }
 
-		function handleUpdateRequest() {
-            global $db_conn;
-
- 
-            $newDuration = $_POST['updateDuration'];
-            $newRating = $_POST['updateRating'];
-            $newName = $_POST['updateName'];
-
-
-			if ($_POST['updateID'] == "") {
-                echo '<script>alert("Need ID to update")</script>';
-            }
-            if ($_POST['updateDuration'] == "") {
-                $result = executePlainSQL("SELECT duration FROM Movie WHERE ID ='" . $_POST['updateID'] . "'");
-                $row = oci_fetch_row($result);
-                $newDuration = $row[0];
-            }
-            if ($_POST['updateRating'] == "") {
-                $result = executePlainSQL("SELECT rating FROM Movie WHERE ID ='" . $_POST['updateID'] . "'");
-                $row = oci_fetch_row($result);
-                $newRating = $row[0];
-            }
-            if ($_POST['updateName'] == "") {
-                $result = executePlainSQL("SELECT name FROM Movie WHERE ID ='" . $_POST['updateID'] . "'");
-                $row = oci_fetch_row($result);
-                $newName = $row[0];
-            }
-
-            $tuple = array (
-                ":bind1" => $_POST['updateID'],
-                ":bind2" => $newDuration,
-                ":bind3" => $newRating,
-                ":bind4" => $newName,
-            );
-            $alltuples = array (
-                $tuple
-            );
-
-			executeBoundSQL(
-                "UPDATE Movie 
-                SET ID =:bind1, duration=:bind2, rating=:bind3, name=:bind4 
-                WHERE ID=:bind1"
-                , $alltuples
-            );
-            OCICommit($db_conn);
-        }
-
 		function handleInsertRequest() {
             global $db_conn;
 
 
             //Getting the values from user and insert data into the table
             $tuple = array (
-                ":bind1" => $_POST['insID'],
-                ":bind2" => $_POST['insDuration'],
-                ":bind3" => $_POST['insRating'],
-                ":bind4" => $_POST['insName']
+                ":bind1" => $_POST['insRoomNum'],
+                ":bind2" => $_POST['theatres'],
+                ":bind3" => $_POST['insCapacity']
             );
 
 
@@ -339,7 +286,7 @@
             );
 
 
-            executeBoundSQL("insert into Movie values (:bind1, :bind2, :bind3, :bind4)", $alltuples);
+            executeBoundSQL("insert into Room values (:bind1, :bind2, :bind3)", $alltuples);
             OCICommit($db_conn);
         }
 
