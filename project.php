@@ -34,6 +34,34 @@
         <button onclick = "document.location = 'project.php'">Customer</button>
         <button onclick = "document.location = 'owner.php'">Manage Theatre</button>
 
+        <h2>Personal Information</h2>
+        <form method="GET" action="project.php">
+        <input type="hidden" id="updateQueryRequest" name="showInfoRequest">
+        Your ID: <input type="text" name="id"> <br /><br />
+        <p><input type="submit" value="Show" name="showInfo"></p>
+        </form>
+        <?php
+        if (isset($_GET['showInfoRequest'])) {
+            handleGETRequest();
+        }
+        ?>   
+
+        <h2>{UPDATE} Update Personal Information</h2>
+        <p>Put your ID to update your personal info. Leave the field empty for unchanged information.</p>
+
+        <form method="POST" action="project.php"> <!--refresh page when submitted-->
+            <input type="hidden" id="updateQueryRequest" name="updateQueryRequest">
+            Your ID: <input type="text" name="updateID"> <br /><br />
+            Update Name: <input type="text" name="updateName"> <br /><br />
+            Update Email: <input type="text" name="updateEmail"> <br /><br />
+            Update Phone: <input type="text" name="updatePhone"> <br /><br />
+            Update Birthday: <input type="date" name="updateDOB"> <br /><br />
+
+            <p><input type="submit" value="Update" name="updateSubmit"></p>
+        </form>
+
+        <hr />
+
         <h2>Movies Rating</h2>
         <form method="GET" action = "project.php">
             <input type = "hidden" id = "movieShown" name = "displayMoviesRatingRequest">
@@ -191,6 +219,8 @@
                     $success = False;
                 }
             }
+
+            return $statement;
         }
 
         function connectToDB() {
@@ -222,6 +252,81 @@
             OCILogoff($db_conn);
         }
 
+        function showInfo() {
+            global $db_conn;
+
+            $tuple = array (
+                ":bind1" => $_GET['id']
+            );
+
+            $alltuples = array (
+                $tuple
+            );
+
+			$result = executeBoundSQL("SELECT * FROM Customer WHERE ID=:bind1", $alltuples);
+
+            echo "<table>";
+            echo "<tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Birthday</th></tr>";
+            while ($row = OCI_Fetch_Array($result)) {
+                echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["NAME"] . "</td><td>" . $row["EMAIL"] . "</td><td>" . $row["PHONE"] . "</td><td>" . $row["DATEOFBIRTH"] . "</td></tr>";
+            }
+            echo "</table>";
+        }
+
+        function handleUpdateRequest() {
+            global $db_conn;
+ 
+            $newName = $_POST['updateName'];
+            $newEmail = $_POST['updateEmail'];
+            $newPhone = $_POST['updatePhone'];
+            $newDOB = $_POST['updateDOB'];
+
+			if ($_POST['updateID'] == "") {
+                echo '<script>alert("Need ID to update")</script>';
+            }
+            if ($_POST['updateName'] == "") {
+                $result = executePlainSQL("SELECT name FROM Customer WHERE ID ='" . $_POST['updateID'] . "'");
+                $row = oci_fetch_row($result);
+                $newName = $row[0];
+            }
+            if ($_POST['updateEmail'] == "") {
+                $result = executePlainSQL("SELECT email FROM Customer WHERE ID ='" . $_POST['updateID'] . "'");
+                $row = oci_fetch_row($result);
+                $newEmail = $row[0];
+            }
+            if ($_POST['updatePhone'] == "") {
+                $result = executePlainSQL("SELECT phone FROM Customer WHERE ID ='" . $_POST['updateID'] . "'");
+                $row = oci_fetch_row($result);
+                $newPhone = $row[0];
+            }
+            if ($_POST['updateDOB'] == "") {
+                $result = executePlainSQL("SELECT dateOfBirth FROM Customer WHERE ID ='" . $_POST['updateID'] . "'");
+                $row = oci_fetch_row($result);
+                $newDOB = $row[0];
+            }
+
+            // $date = new DateTime($newDOB);
+            // $newDOB = $date->format('Y-m-d H:i:s');
+
+            $tuple = array (
+                ":bind1" => $_POST['updateID'],
+                ":bind2" => $newName,
+                ":bind3" => $newEmail,
+                ":bind4" => $newPhone
+            );
+
+            $alltuples = array (
+                $tuple
+            );
+
+			executeBoundSQL(
+                "UPDATE Customer 
+                SET ID =:bind1, name=:bind2, email=:bind3, phone=:bind4, dateOfBirth=DATE'$newDOB'
+                WHERE ID=:bind1"
+                , $alltuples
+            );
+            OCICommit($db_conn);
+        }
 
         function handleMovieShownRequest() {
             global $db_conn;
@@ -316,14 +421,9 @@
     // A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
         function handlePOSTRequest() {
             if (connectToDB()) {
-                if (array_key_exists('resetTablesRequest', $_POST)) {
-                    handleResetRequest();
-                } else if (array_key_exists('updateQueryRequest', $_POST)) {
+                 if (array_key_exists('updateQueryRequest', $_POST)) {
                     handleUpdateRequest();
-                } else if (array_key_exists('insertQueryRequest', $_POST)) {
-                    handleInsertRequest();
-                }
-
+                } 
 
                 disconnectFromDB();
             }
@@ -334,26 +434,17 @@
     // A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
         function handleGETRequest() {
             if (connectToDB()) {
-                if (array_key_exists('countTuples', $_GET)) {
-                    handleCountRequest();
-                }
-                else if (array_key_exists('displayTuples', $_GET)) {
-                    handleDisplayRequest();
-                }
-                else if (array_key_exists('displayMoviesShown', $_GET)) {
+                if (array_key_exists('displayMoviesShown', $_GET)) {
                     handleMovieShownRequest();
                 }
                 else if (array_key_exists('displayMoviesRating', $_GET)) {
                     handleMovieRatingRequest();
                 }
-                else if (array_key_exists('displaySales', $_GET)) {
-                    handleDisplaySalesRequest();
-                }
                 else if (array_key_exists('displayMoviesSelect', $_GET)) {
                     handleDisplayMoviesSelectRequest();
-                }
-                else if (array_key_exists('theatreDelete', $_GET)) {
-                    handleTheatreDeleteRequest();
+                } 
+                else if (array_key_exists('showInfo', $_GET)) {
+                    showInfo();
                 }
 
 
