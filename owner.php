@@ -155,7 +155,9 @@
             if (!$statement) {
                 echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
                 $e = OCI_Error($db_conn); // For OCIParse errors pass the connection handle
-                echo htmlentities($e['message']);
+                $errorMessage = $e['message'];
+                echo htmlentities($errorMessage);  //error message
+                echo '<script>alert("'.$errorMessage.'")</script>';
                 $success = False;
             }
 
@@ -164,7 +166,9 @@
             if (!$r) {
                 echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
                 $e = oci_error($statement); // For OCIExecute errors pass the statementhandle
-                echo htmlentities($e['message']);
+                $errorMessage = $e['message'];
+                echo htmlentities($errorMessage);  //error message
+                echo '<script>alert("'.$errorMessage.'")</script>';
                 $success = False;
             }
 
@@ -187,7 +191,9 @@
             if (!$statement) {
                 echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
                 $e = OCI_Error($db_conn);
-                echo htmlentities($e['message']);
+                $errorMessage = $e['message'];
+                echo htmlentities($errorMessage);  //error message
+                echo '<script>alert("'.$errorMessage.'")</script>';
                 $success = False;
             }
 
@@ -205,10 +211,14 @@
                 if (!$r) {
                     echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
                     $e = OCI_Error($statement); // For OCIExecute errors, pass the statementhandle
-                    echo htmlentities($e['message']);  //error message
                     $errorMessage = $e['message'];
-                    echo '<script>alert(' . $errorMessage . ')</script>';
-                    echo '<script>alert("Invalid input!  Error: ' . $errorMessage . '")</script>';
+                    echo htmlentities($errorMessage);  //error message
+
+                    $needle = "unique";
+                    if (str_contains($errorMessage, $needle)) {
+                        echo '<script>alert("Tuple already exists in table!")</script>';
+                    }
+                    echo '<script>alert("'.$errorMessage.'")</script>';
                     echo "<br>";
                     $success = False;
                 }
@@ -273,7 +283,7 @@
         }
 
 		function handleInsertRequest() {
-            global $db_conn;
+            global $db_conn, $success;
 
 
             //Getting the values from user and insert data into the table
@@ -288,6 +298,9 @@
                 $tuple
             );
 
+            if ($_POST['insRoomNum'] == "") {
+                echo '<script>alert("RoomNum cannot be empty!")</script>';
+            }
 
             executeBoundSQL("insert into Room values (:bind1, :bind2, :bind3)", $alltuples);
             OCICommit($db_conn);
