@@ -15,7 +15,7 @@ CREATE TABLE Customer (
 	ID 		VARCHAR(20) PRIMARY KEY,
 	name   		VARCHAR(30),
 	email   		VARCHAR(40)  UNIQUE NOT NULL,
-	phone	 	VARCHAR(15),
+	phone	 	VARCHAR(10),
 	dateOfBirth 	DATE,
 UNIQUE  (name, phone, dateOfBirth)
 );
