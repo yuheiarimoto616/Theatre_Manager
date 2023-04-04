@@ -120,7 +120,8 @@ CREATE TABLE Eats (
 	customerID 		VARCHAR(20),
 	concessionStandID   	VARCHAR(20),
 	foodStuffID		VARCHAR(20),
-	PRIMARY KEY (customerID, concessionStandID, foodStuffID),
+    timeBought      TIMESTAMP,
+	PRIMARY KEY (customerID, concessionStandID, foodStuffID, timeBought),
 	FOREIGN KEY (customerID) REFERENCES Customer(ID),
 	FOREIGN KEY (foodStuffID, concessionStandID) REFERENCES Offers(foodStuffID, concessionStandID) ON DELETE CASCADE
 );
@@ -232,30 +233,27 @@ VALUES ('100', 'BigMac Meal', 12.0);
 INSERT INTO  Foodstuff(ID, name, price) 
 VALUES ('101', 'Fries', 3.5);
 INSERT INTO  Foodstuff(ID, name, price) 
-VALUES ('2001', 'Iced Latte', 5.5);
-INSERT INTO  Foodstuff(ID, name, price) 
-VALUES ('57', 'Wedges', 4.5);
-INSERT INTO  Foodstuff(ID, name, price) 
-VALUES ('3', 'Root Beer', 2.5);
+VALUES ('102', 'Iced Latte', 5.5);
+
 
 INSERT INTO  Offers(foodStuffID, concessionStandID) 
 VALUES ('100', '12');
 INSERT INTO  Offers(foodStuffID, concessionStandID) 
-VALUES ('2001', '1234');
+VALUES ('101', '12');
 INSERT INTO  Offers(foodStuffID, concessionStandID) 
-VALUES ('2001', '115');
+VALUES ('102', '12');
 INSERT INTO  Offers(foodStuffID, concessionStandID) 
-VALUES ('3', '1');
+VALUES ('101', '1');
 INSERT INTO  Offers(foodStuffID, concessionStandID) 
-VALUES ('57', '602');
+VALUES ('100', '602');
 
-INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID) 
-VALUES ('1', '12', '100');
-INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID) 
-VALUES ('2', '115', '2001');
-INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID) 
-VALUES ('2', '12', '100');
-INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID) 
-VALUES ('3', '602', '57');
-INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID) 
-VALUES ('4', '1234', '2001');
+INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID, timeBought) 
+VALUES ('1', '12', '100', to_timestamp('2023/04/01 09:00', 'YYYY/MM/DD HH24 MI'));
+INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID, timeBought) 
+VALUES ('1', '12', '101', to_timestamp('2023/04/01 09:00', 'YYYY/MM/DD HH24 MI'));
+INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID, timeBought) 
+VALUES ('1', '12', '102', to_timestamp('2023/04/01 09:00', 'YYYY/MM/DD HH24 MI'));
+INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID, timeBought) 
+VALUES ('2', '12', '100', to_timestamp('2023/04/01 11:00', 'YYYY/MM/DD HH24 MI'));
+INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID, timeBought) 
+VALUES ('4', '12', '100', to_timestamp('2023/04/01 10:00', 'YYYY/MM/DD HH24 MI'));
