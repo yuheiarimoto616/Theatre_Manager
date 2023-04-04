@@ -44,16 +44,16 @@ CREATE TABLE Theatre (
 	address 	VARCHAR(50) PRIMARY KEY,
 	phone		VARCHAR(20) UNIQUE
 );
+
 grant select on Theatre to public;
 
 CREATE TABLE Room (
 	roomNum 	INTEGER,
-	address	VARCHAR(50),
+	address	VARCHAR(50) NOT NULL,
 	capacity	INTEGER,
 	PRIMARY KEY (roomNum, address),
-	FOREIGN KEY (address) REFERENCES Theatre(address)
-		ON DELETE CASCADE
-);
+	FOREIGN KEY (address) REFERENCES Theatre ON DELETE CASCADE);
+
 grant select on Room to public;
 
 CREATE TABLE Shows (
@@ -61,7 +61,7 @@ CREATE TABLE Shows (
 	roomNum	INTEGER,	
 	movieID	VARCHAR(20),
 	PRIMARY KEY (address, roomNum, movieID),
-	FOREIGN KEY (roomNum, address) REFERENCES Room(roomNum, address),
+	FOREIGN KEY (roomNum, address) REFERENCES Room(roomNum, address) ON DELETE CASCADE,
 	FOREIGN KEY (movieID) REFERENCES Movie(ID)
 );
 grant select on Shows to public;
@@ -72,7 +72,8 @@ CREATE TABLE MovieSchedule (
 	address	VARCHAR(50),
 	movieID 	VARCHAR(20) NOT NULL,
 	PRIMARY KEY (time, roomNum, address),
-	FOREIGN KEY (address, roomNum, movieID) REFERENCES Shows(address, roomNum, movieID) 
+	FOREIGN KEY (address, roomNum, movieID) REFERENCES Shows(address, roomNum, movieID)
+	ON DELETE CASCADE
 );
 grant select on MovieSchedule to public;
 
@@ -87,7 +88,7 @@ CREATE TABLE Ticket (
 	roomNum	INTEGER NOT NULL,
 	UNIQUE (time, roomNum, address, seatNum),
 	FOREIGN KEY (customerID) REFERENCES Customer(ID),
-FOREIGN KEY (time, roomNum, address) REFERENCES MovieSchedule(time, roomNum, address)
+	FOREIGN KEY (time, roomNum, address) REFERENCES MovieSchedule(time, roomNum, address) ON DELETE CASCADE
 );
 grant select on Ticket to public;
 
@@ -95,7 +96,7 @@ CREATE TABLE ConcessionStand (
 	ID 		VARCHAR(20) PRIMARY KEY,
 	name   		VARCHAR(20),
 	address           	VARCHAR(50) NOT NULL,
-	FOREIGN KEY (address) REFERENCES Theatre(address)
+	FOREIGN KEY (address) REFERENCES Theatre(address) ON DELETE CASCADE
 );
 grant select on ConcessionStand to public;
 
@@ -111,7 +112,7 @@ CREATE TABLE Offers (
 	concessionStandID   	VARCHAR(20),
 	PRIMARY KEY (foodStuffID, concessionStandID),
 	FOREIGN KEY (foodStuffID) REFERENCES Foodstuff(ID),
-	FOREIGN KEY (concessionStandID) REFERENCES ConcessionStand(ID)
+	FOREIGN KEY (concessionStandID) REFERENCES ConcessionStand(ID) ON DELETE CASCADE
 );
 grant select on Offers to public;
 
@@ -121,7 +122,7 @@ CREATE TABLE Eats (
 	foodStuffID		VARCHAR(20),
 	PRIMARY KEY (customerID, concessionStandID, foodStuffID),
 	FOREIGN KEY (customerID) REFERENCES Customer(ID),
-	FOREIGN KEY (foodStuffID, concessionStandID) REFERENCES Offers(foodStuffID, concessionStandID)
+	FOREIGN KEY (foodStuffID, concessionStandID) REFERENCES Offers(foodStuffID, concessionStandID) ON DELETE CASCADE
 );
 grant select on Eats to public;
  
