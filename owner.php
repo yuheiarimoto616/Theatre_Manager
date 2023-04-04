@@ -205,7 +205,10 @@
                 if (!$r) {
                     echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
                     $e = OCI_Error($statement); // For OCIExecute errors, pass the statementhandle
-                    echo htmlentities($e['message']);
+                    echo htmlentities($e['message']);  //error message
+                    $errorMessage = $e['message'];
+                    echo '<script>alert(' . $errorMessage . ')</script>';
+                    echo '<script>alert("Invalid input!  Error: ' . $errorMessage . '")</script>';
                     echo "<br>";
                     $success = False;
                 }
