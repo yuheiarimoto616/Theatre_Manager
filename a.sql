@@ -15,7 +15,7 @@ CREATE TABLE Customer (
 	ID 		VARCHAR(20) PRIMARY KEY,
 	name   		VARCHAR(30),
 	email   		VARCHAR(40)  UNIQUE NOT NULL,
-	phone	 	VARCHAR(10),
+	phone	 	VARCHAR(15),
 	dateOfBirth 	DATE,
 UNIQUE  (name, phone, dateOfBirth)
 );
@@ -120,7 +120,7 @@ CREATE TABLE Eats (
 	customerID 		VARCHAR(20),
 	concessionStandID   	VARCHAR(20),
 	foodStuffID		VARCHAR(20),
-    timeBought      TIMESTAMP,
+	timeBought      TIMESTAMP,
 	PRIMARY KEY (customerID, concessionStandID, foodStuffID, timeBought),
 	FOREIGN KEY (customerID) REFERENCES Customer(ID),
 	FOREIGN KEY (foodStuffID, concessionStandID) REFERENCES Offers(foodStuffID, concessionStandID) ON DELETE CASCADE
@@ -162,19 +162,19 @@ VALUES ('4', 3.2, 'Super Mid movie, not bad', '3', '157982');
 INSERT INTO Review(ID, star, commentText, customerID, movieID)
 VALUES ('10', 4.1, 'Pretty good. Great actors', '4', '113');
 INSERT INTO Review(ID, star, commentText, customerID, movieID)
-VALUES ('11', 4.1, 'Pretty good. Great actors', '4', '113');
+VALUES ('11', 5.0, 'good', '2', '113');
 INSERT INTO Review(ID, star, commentText, customerID, movieID)
-VALUES ('12', 2, 'Pretty good. Great actors', '4', '113');
+VALUES ('12', 2, 'Pretty good. Great actors', '5', '113');
 INSERT INTO Review(ID, star, commentText, customerID, movieID)
-VALUES ('13', 4.1, 'Pretty good. Great actors', '4', '113');
+VALUES ('13', 4.1, 'Pretty good. Great actors', '1', '113');
 INSERT INTO Review(ID, star, commentText, customerID, movieID)
-VALUES ('14', 3, 'Super Mid movie, not bad', '3', '157982');
+VALUES ('14', 3, 'Super Mid movie, not bad', '2', '157982');
 INSERT INTO Review(ID, star, commentText, customerID, movieID)
-VALUES ('15', 1, 'Super Mid movie, not bad', '3', '157982');
+VALUES ('15', 1, 'Super Mid movie, not bad', '4', '157982');
 INSERT INTO Review(ID, star, commentText, customerID, movieID)
-VALUES ('16', 2, 'Super Mid movie, not bad', '3', '157982');
+VALUES ('16', 2, 'Super Mid movie, not bad', '5', '157982');
 INSERT INTO Review(ID, star, commentText, customerID, movieID)
-VALUES ('17', 1, 'Super Mid movie, not bad', '3', '157982');
+VALUES ('17', 1, 'Super Mid movie, not bad', '1', '157982');
 
 INSERT INTO Theatre(address, phone) 
 VALUES ('1234 West Mall, Vancouver, BC', '3251112682');
@@ -255,7 +255,6 @@ VALUES ('104', 'Coca cola', 5.5);
 INSERT INTO  Foodstuff(ID, name, price) 
 VALUES ('105', 'Popcorn', 5.5);
 
-
 INSERT INTO  Offers(foodStuffID, concessionStandID) 
 VALUES ('100', '12');
 INSERT INTO  Offers(foodStuffID, concessionStandID) 
@@ -292,10 +291,9 @@ VALUES ('1', '12', '105', to_timestamp('2023/04/01 09:00', 'YYYY/MM/DD HH24 MI')
 INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID, timeBought) 
 VALUES ('1', '12', '105', to_timestamp('2023/04/01 09:02', 'YYYY/MM/DD HH24 MI'));
 INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID, timeBought) 
-VALUES ('1', '12', '105', to_timestamp('2023/04/01 09:03', 'YYYY/MM/DD HH24 MI'));
+VALUES ('1', '12', '105', to_timestamp('2023/04/03 09:03', 'YYYY/MM/DD HH24 MI'));
 INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID, timeBought) 
 VALUES ('1', '1', '101', to_timestamp('2023/04/01 09:03', 'YYYY/MM/DD HH24 MI'));
-
 
 INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID, timeBought) 
 VALUES ('2', '12', '100', to_timestamp('2023/04/01 02:00', 'YYYY/MM/DD HH24 MI'));
@@ -311,6 +309,7 @@ INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID, timeBought)
 VALUES ('2', '12', '105', to_timestamp('2023/04/01 09:00', 'YYYY/MM/DD HH24 MI'));
 INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID, timeBought) 
 VALUES ('2', '12', '100', to_timestamp('2023/04/01 11:00', 'YYYY/MM/DD HH24 MI'));
+
 INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID, timeBought) 
 VALUES ('4', '12', '100', to_timestamp('2023/04/01 10:00', 'YYYY/MM/DD HH24 MI'));
 INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID, timeBought) 
