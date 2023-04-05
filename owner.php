@@ -101,6 +101,19 @@
         ?>
 
         <hr />
+        <h2>{Nested Aggregation with GROUP BY}</h2>
+        <h3>Find the average number of foodstuff a customer eats for customers who have ordered at least one thing.</h3>
+        <form method="GET" action = "owner.php">
+            <input type = "hidden" id = "movieShown" name = "displayAvgFoodRequest">
+            <p><input type="submit" value = "Submit" name="displayAvgFood"></p>
+        </form>
+        <?php
+        if (isset($_GET['displayAvgFoodRequest'])) {
+            handleGETRequest();
+        }
+        ?>
+
+        <hr />
 
         <h2>{DIVISION} Finding customers who have eaten all types of food offered</h2>
         <form method="GET" action = "owner.php">
@@ -367,10 +380,31 @@
 
 
             while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-                // echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["duration"] . "</td><td>" . $row["Rating"] . "</td><td>" . $row["Name"] . "</td></tr>"; //or just use "echo $row[0]"
-                // echo "<tr><td" . $row["ID"]
-                // echo $row[0];
                 echo "<tr><td>" . $row["ADDRESS"] . "</td><td>" . $row["SALES"] . "</td></tr>";
+            }
+
+
+            echo "</table>";
+        }
+
+        function handleDisplayAvgFoodRequest() {
+            global $db_conn;
+
+
+            $result = executePlainSQL(
+                "SELECT AVG(countPerCustomer) as averageFoodPerCustomer
+                FROM (SELECT customerID, COUNT(*) as countPerCustomer
+                    FROM Eats
+                    GROUP BY customerID) 
+                ");
+
+
+            echo "<table>";
+            echo "<tr><th>Average food items bought per customers who have ordered at least one thing.</th></tr>";
+
+
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                echo "<tr><td>" . $row[0] . "</td></tr>";
             }
 
 
@@ -447,6 +481,9 @@
                 }
                 else if (array_key_exists('displaySales', $_GET)) {
                     handleDisplaySalesRequest();
+                }
+                else if (array_key_exists('displayAvgFood', $_GET)) {
+                    handleDisplayAvgFoodRequest();
                 }
                 else if (array_key_exists('displayDivision', $_GET)) {
                     handleDisplayDivisionRequest();
