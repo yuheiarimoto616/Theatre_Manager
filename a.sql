@@ -120,7 +120,7 @@ CREATE TABLE Eats (
 	customerID 		VARCHAR(20),
 	concessionStandID   	VARCHAR(20),
 	foodStuffID		VARCHAR(20),
-    timeBought      TIMESTAMP,
+	timeBought      TIMESTAMP,
 	PRIMARY KEY (customerID, concessionStandID, foodStuffID, timeBought),
 	FOREIGN KEY (customerID) REFERENCES Customer(ID),
 	FOREIGN KEY (foodStuffID, concessionStandID) REFERENCES Offers(foodStuffID, concessionStandID) ON DELETE CASCADE
@@ -235,7 +235,6 @@ VALUES ('101', 'Fries', 3.5);
 INSERT INTO  Foodstuff(ID, name, price) 
 VALUES ('102', 'Iced Latte', 5.5);
 
-
 INSERT INTO  Offers(foodStuffID, concessionStandID) 
 VALUES ('100', '12');
 INSERT INTO  Offers(foodStuffID, concessionStandID) 
@@ -255,5 +254,7 @@ INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID, timeBought)
 VALUES ('1', '12', '102', to_timestamp('2023/04/01 09:00', 'YYYY/MM/DD HH24 MI'));
 INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID, timeBought) 
 VALUES ('2', '12', '100', to_timestamp('2023/04/01 11:00', 'YYYY/MM/DD HH24 MI'));
+INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID, timeBought) 
+VALUES ('2', '1', '101', to_timestamp('2023/04/01 15:00', 'YYYY/MM/DD HH24 MI'));
 INSERT INTO  Eats(customerID, concessionStandID,  foodStuffID, timeBought) 
 VALUES ('4', '12', '100', to_timestamp('2023/04/01 10:00', 'YYYY/MM/DD HH24 MI'));
