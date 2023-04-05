@@ -101,8 +101,9 @@
         ?>
 
         <hr />
+
         <h2>{Nested Aggregation with GROUP BY}</h2>
-        <h3>Find the average number of foodstuff a customer eats for customers who have ordered at least one thing.</h3>
+        <h3>Find the average number of foodstuff a customer eats</h3>
         <form method="GET" action = "owner.php">
             <input type = "hidden" id = "movieShown" name = "displayAvgFoodRequest">
             <p><input type="submit" value = "Submit" name="displayAvgFood"></p>
@@ -113,7 +114,7 @@
         }
         ?>
 
-        <hr />
+		<hr />
 
         <h2>{DIVISION} Finding customers who have eaten all types of food offered</h2>
         <form method="GET" action = "owner.php">
@@ -126,7 +127,7 @@
         }
         ?>
 
-		<hr />
+        <hr />
 
         <h2>{DELETE} Delete theatre (which cascades rooms)</h2>
         <form method="POST" action = "owner.php">
@@ -233,13 +234,16 @@
                     echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
                     $e = OCI_Error($statement); // For OCIExecute errors, pass the statementhandle
                     $errorMessage = $e['message'];
+                    // echo '<script>alert(' . $errorMessage . ')</script>';
+                    // echo '<script>alert("Invalid input!  Error: ' . $errorMessage . '")</script>';
                     echo htmlentities($errorMessage);  //error message
-
                     $needle = "unique";
                     if (str_contains($errorMessage, $needle)) {
                         echo '<script>alert("Tuple already exists in table!")</script>';
                     }
-                    echo '<script>alert("'.$errorMessage.'")</script>';
+                    else {
+                        echo '<script>alert("'.$errorMessage.'")</script>';
+                    }
                     echo "<br>";
                     $success = False;
                 }
@@ -252,7 +256,7 @@
 
             // Your username is ora_(CWL_ID) and the password is a(student number). For example,
             // ora_platypus is the username and a12345678 is the password.
-            $db_conn = OCILogon("ora_seanquan", "a43496900", "dbhost.students.cs.ubc.ca:1522/stu");
+            $db_conn = OCILogon("ora_yuhei616", "a36561967", "dbhost.students.cs.ubc.ca:1522/stu");
 
 
             if ($db_conn) {
@@ -395,7 +399,7 @@
 
 
             echo "<table>";
-            echo "<tr><th>Average food items bought per customers who have ordered at least one thing.</th></tr>";
+            echo "<tr><th>Average food items per customers</th></tr>";
 
 
             while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
@@ -427,7 +431,7 @@
         }
 
         function handleTheatreDeleteRequest() {
-            global $db_conn;
+            global $db_conn, $success;
 
             $tuple = array (
                 ":bind1" => $_POST['theatres']
@@ -438,10 +442,7 @@
                 $tuple
             );
 
-            print_r($_POST['theatres']);
-            print_r("hello world");
             executeBoundSQL("DELETE FROM Theatre WHERE address = :bind1", $alltuples);
-            executePlainSQL("DELETE FROM Theatre WHERE address = '" . $_POST['theatres'] . "'");
             OCICommit($db_conn);
         }
 
@@ -460,10 +461,7 @@
                 }
 
                 if ($success) {
-                    echo '<script>alert("POST success")</script>';
-                }
-                else {
-                    echo '<script>alert("POST failed")</script>';
+                    echo '<script>alert("Success")</script>';
                 }
 
 				disconnectFromDB();
@@ -471,6 +469,8 @@
 		}
 
 		function handleGETRequest() {
+            global $success;
+
             if (connectToDB()) {
                 if (array_key_exists('countTuples', $_GET)) {
                     handleCountRequest();
@@ -487,6 +487,7 @@
                 else if (array_key_exists('displayDivision', $_GET)) {
                     handleDisplayDivisionRequest();
                 }
+
 
                 disconnectFromDB();
             }
