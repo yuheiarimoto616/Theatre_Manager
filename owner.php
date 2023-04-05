@@ -129,7 +129,7 @@
 		<hr />
 
         <h2>{DELETE} Delete theatre (which cascades rooms)</h2>
-        <form method="GET" action = "owner.php">
+        <form method="POST" action = "owner.php">
             <input type = "hidden" id = "theatreDelete" name = "theatreDeleteRequest">
             Theatre address:
             <select id = "theatres" name = "theatres">
@@ -146,11 +146,6 @@
             </select>
             <p><input type="submit" value = "Submit" name="theatreDelete"></p>
         </form>
-        <?php
-        if (isset($_GET['theatreDeleteRequest'])) {
-            handleGETRequest();
-        }
-        ?>
 
 		<hr />
 
@@ -435,7 +430,7 @@
             global $db_conn;
 
             $tuple = array (
-                ":bind1" => $_GET['theatres']
+                ":bind1" => $_POST['theatres']
             );
 
 
@@ -443,8 +438,10 @@
                 $tuple
             );
 
-
+            print_r($_POST['theatres']);
+            print_r("hello world");
             executeBoundSQL("DELETE FROM Theatre WHERE address = :bind1", $alltuples);
+            executePlainSQL("DELETE FROM Theatre WHERE address = '" . $_POST['theatres'] . "'");
             OCICommit($db_conn);
         }
 
@@ -458,7 +455,9 @@
 					handleUpdateRequest();
 				} else if (array_key_exists('insertQueryRequest', $_POST)) {
 					handleInsertRequest();
-				}
+				} else if (array_key_exists('theatreDeleteRequest', $_POST)) {
+                    handleTheatreDeleteRequest();
+                }
 
                 if ($success) {
                     echo '<script>alert("POST success")</script>';
@@ -488,16 +487,12 @@
                 else if (array_key_exists('displayDivision', $_GET)) {
                     handleDisplayDivisionRequest();
                 }
-                else if (array_key_exists('theatreDelete', $_GET)) {
-                    handleTheatreDeleteRequest();
-                }
-
 
                 disconnectFromDB();
             }
         }
 
-		if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit'])) {
+		if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit']) || isset($_POST['theatreDelete'])) {
 			handlePOSTRequest();
 		} 
 		?>
