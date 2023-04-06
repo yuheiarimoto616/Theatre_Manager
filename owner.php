@@ -11,18 +11,8 @@
 	<body>
 		<button onclick = "document.location = 'project.php'">Customer</button>
 		<button onclick = "document.location = 'owner.php'">Manage Theatre</button>
-		<h2>Reset</h2>
-        <p>If you wish to reset the table press on the reset button. If this is the first time you're running this page, you MUST use reset</p>
 
-		<form method="POST" action="owner.php">
-			<!-- if you want another page to load after the button is clicked, you have to specify that page in the action parameter -->
-			<input type="hidden" id="resetTablesRequest" name="resetTablesRequest">
-			<p><input type="submit" value="Reset" name="reset"></p>
-		</form>
-
-		<hr />
-
-		<h2>{INSERTION} Add Room</h2>
+		<h2>Add Room</h2>
         <form method="POST" action="owner.php"> <!--refresh page when submitted-->
             <input type="hidden" id="insertQueryRequest" name="insertQueryRequest">
             Room Number: <input type="text" name="insRoomNum"> <br /><br />
@@ -60,13 +50,15 @@
         }
         ?>
 
+        
+
 
         <hr /> -->
 
-		<h2>Display the Tuples in Movie</h2>
-        <form method="GET" action="owner.php"> <!--refresh page when submitted-->
-            <input type="hidden" id="displayTupleRequest" name="displayTupleRequest">
-            Table:
+        <h2>Display Data</h2>
+        <form method="GET" action=""> <!--refresh page when submitted-->
+            <input type="hidden" id="displayColsRequest" name="displayColsRequest">
+            Type:
             <select id = "tables" name = "tables">
                 <?php
                 if (connectToDB()) {
@@ -79,13 +71,40 @@
                         </option>
                 <?php }}?>
             </select>
-            <p><input type="submit" name="displayTuples"></p>
+            <p><input type="submit" value="Select" name="displayCols"></p>
         </form>
         <?php
+        if (isset($_GET['displayColsRequest'])) {
+            handleGETRequest();
+        }
         if (isset($_GET['displayTupleRequest'])) {
             handleGETRequest();
         }
         ?>
+
+		<!-- <h2>Display the Tuples in Movie</h2>
+        <form method="GET" action="owner.php"> 
+            <input type="hidden" id="displayTupleRequest" name="displayTupleRequest">
+            Table:
+            <select id = "tables" name = "tables">
+                ?php
+                if (connectToDB()) {
+                    global $db_conn;
+                    $result = executePlainSQL("SELECT table_name FROM user_tables");
+                    while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                ?>
+                        <option value = "?php echo $row["TABLE_NAME"]; ?>">
+                        ?php echo $row["TABLE_NAME"];?>
+                        </option>
+                ?php }}?>
+            </select>
+            <p><input type="Select" name="displayTuples"></p>
+        </form>
+        ?php
+        if (isset($_GET['displayTupleRequest'])) {
+            handleGETRequest();
+        }
+        ?> -->
 
 		<hr />
 
@@ -102,8 +121,7 @@
 
         <hr />
 
-        <h2>{Nested Aggregation with GROUP BY}</h2>
-        <h3>Find the average number of foodstuff a customer eats</h3>
+        <h2>Find the average number of foodstuff a customer eats</h2>
         <form method="GET" action = "owner.php">
             <input type = "hidden" id = "movieShown" name = "displayAvgFoodRequest">
             <p><input type="submit" value = "Submit" name="displayAvgFood"></p>
@@ -116,7 +134,7 @@
 
 		<hr />
 
-        <h2>{DIVISION} Finding customers who have eaten all types of food offered</h2>
+        <h2>Find customers who have eaten all types of food offered</h2>
         <form method="GET" action = "owner.php">
             <input type = "hidden" id = "movieShown" name = "displayDivisionRequest">
             <p><input type="submit" value = "Submit" name="displayDivision"></p>
@@ -129,7 +147,7 @@
 
         <hr />
 
-        <h2>{DELETE} Delete theatre (which cascades rooms)</h2>
+        <h2>Delete Theatre</h2>
         <form method="POST" action = "owner.php">
             <input type = "hidden" id = "theatreDelete" name = "theatreDeleteRequest">
             Theatre address:
@@ -154,7 +172,6 @@
 		$success = True; //keep track of errors so it redirects the page only if there are no errors
         $db_conn = NULL; // edit the login credentials in connectToDB()
         $show_debug_alert_messages = False; // set to True if you want alerts to show you which methods are being triggered (see how it is used in debugAlertMessage())
-
 
         function debugAlertMessage($message) {
             global $show_debug_alert_messages;
@@ -239,7 +256,7 @@
                     echo htmlentities($errorMessage);  //error message
                     $needle = "unique";
                     if (str_contains($errorMessage, $needle)) {
-                        echo '<script>alert("Tuple already exists in table!")</script>';
+                        echo '<script>alert("Failed! Already exists!")</script>';
                     }
                     else {
                         echo '<script>alert("'.$errorMessage.'")</script>';
@@ -282,7 +299,6 @@
 		function printResult($result) { //prints results from a select statement
             global $db_conn;
             echo "<table>";
-            $table = $_GET['tables'];
             $cols =  executePlainSQL("SELECT DISTINCT column_name from USER_TAB_COLS WHERE table_name='$table'");
             echo "<tr>";
             while ($colsArray =  OCI_Fetch_Array($cols, OCI_BOTH)) {
@@ -324,7 +340,7 @@
             );
 
             if ($_POST['insRoomNum'] == "") {
-                echo '<script>alert("RoomNum cannot be empty!")</script>';
+                echo '<script>alert("Failed RoomNum cannot be empty!")</script>';
             }
 
             executeBoundSQL("insert into Room values (:bind1, :bind2, :bind3)", $alltuples);
@@ -343,25 +359,64 @@
             }
         }
 
-		function handleResetRequest() {
-			global $db_conn;
-			// Drop old table
-			executePlainSQL("DROP TABLE Movie");
+		// function handleResetRequest() {
+		// 	global $db_conn;
+		// 	// Drop old table
+		// 	executePlainSQL("DROP TABLE Movie");
 
 
-			// Create new table
-			echo "<br> creating new table <br>";
-			executePlainSQL("CREATE TABLE Movie (ID VARCHAR(20) PRIMARY KEY, duration INTEGER NOT NULL, rating  VARCHAR(10), name VARCHAR(50) NOT NULL)");
-			OCICommit($db_conn);
-		}
+		// 	// Create new table
+		// 	echo "<br> creating new table <br>";
+		// 	executePlainSQL("CREATE TABLE Movie (ID VARCHAR(20) PRIMARY KEY, duration INTEGER NOT NULL, rating  VARCHAR(10), name VARCHAR(50) NOT NULL)");
+		// 	OCICommit($db_conn);
+		// }
 
-		function handleDisplayRequest() {
+        function handleDisplayColsRequest() {
             global $db_conn;
 
             $table = $_GET['tables'];
 
-            $result = executePlainSQL("SELECT * FROM $table");
-            printResult($result);
+            echo "<form method='GET' action='owner.php'>";
+            echo "<input type='hidden' id='displayTupleRequest' name='displayTupleRequest'>";
+            echo "<input type = 'hidden' id='table' name='table' value=" . $table . ">";
+            echo "Columns: <br/>";
+            $cols =  executePlainSQL("SELECT DISTINCT column_name from USER_TAB_COLS WHERE table_name='$table'");
+            while ($colsArray =  OCI_Fetch_Array($cols, OCI_BOTH)) {
+                echo "<input type='checkbox' name='cols[]' value=" . $colsArray["COLUMN_NAME"] .  ">" . $colsArray["COLUMN_NAME"] . "<br/>";
+            }
+            echo "<p><input type='Submit' name='displayTuples'></p>";
+            echo "</form>";
+        }
+
+		function handleDisplayRequest() {
+            global $db_conn;
+
+            $cols = $_GET['cols'];
+            $table = $_GET['table'];
+            $select = "";
+            foreach($cols as $col) {
+                $select .= $col . ", ";
+            }
+            $select = chop($select, ", ");
+
+            $result = executePlainSQL("SELECT $select FROM $table");
+            // printResult($result);
+            echo "<table>";
+            echo "<tr>";
+            foreach ($cols as $col) {
+                echo "<th>" . $col. "</th>";
+            }
+            echo "</tr>";
+
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                echo "<tr>";
+                foreach ($cols as $col) {
+                    echo  "<td>" . $row[$col] . "</td>";
+                }
+                echo "</tr>";
+            }
+
+            echo "</table>";
         }
 
 		function handleDisplaySalesRequest() {
@@ -450,9 +505,7 @@
             global $success;
 
 			if (connectToDB()) {
-				if (array_key_exists('resetTablesRequest', $_POST)) {
-					handleResetRequest();
-				} else if (array_key_exists('updateQueryRequest', $_POST)) {
+				if (array_key_exists('updateQueryRequest', $_POST)) {
 					handleUpdateRequest();
 				} else if (array_key_exists('insertQueryRequest', $_POST)) {
 					handleInsertRequest();
@@ -475,6 +528,9 @@
                 if (array_key_exists('countTuples', $_GET)) {
                     handleCountRequest();
                 }
+                else if (array_key_exists('displayCols', $_GET)) {
+                    handleDisplayColsRequest();
+                }
                 else if (array_key_exists('displayTuples', $_GET)) {
                     handleDisplayRequest();
                 }
@@ -493,8 +549,8 @@
             }
         }
 
-		if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit']) || isset($_POST['theatreDelete'])) {
-			handlePOSTRequest();
+		if (isset($_POST['updateSubmit']) || isset($_POST['insertSubmit']) || isset($_POST['theatreDelete'])) {
+            handlePOSTRequest();
 		} 
 		?>
 	</body>
