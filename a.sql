@@ -32,7 +32,7 @@ grant select on Movie to public;
 CREATE TABLE Review (
 ID		VARCHAR(20) PRIMARY KEY,
 star		FLOAT,
-commentText      	VARCHAR(500),
+commentText      	VARCHAR(1000),
 customerID   	VARCHAR(20)  NOT NULL,
 movieID        	VARCHAR(20)  NOT NULL,
 FOREIGN KEY (customerID) REFERENCES Customer(ID),
