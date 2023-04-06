@@ -46,7 +46,7 @@
         }
         ?>   
 
-        <h2>{UPDATE} Update Personal Information</h2>
+        <h2>Update Personal Information</h2>
         <p>Put your ID to update your personal info. Leave the field empty for unchanged information.</p>
 
         <form method="POST" action="project.php"> <!--refresh page when submitted-->
@@ -105,7 +105,7 @@
 
 
         <hr />
-        <h2>{SELECTION} Select movies based on rating</h2>
+        <h2>Select movies based on rating</h2>
         <form method="GET" action = "project.php">
             <input type = "hidden" id = "moviesSelect" name = "displayMoviesSelectRequest">
             Rating:
@@ -235,7 +235,7 @@
 
             // Your username is ora_(CWL_ID) and the password is a(student number). For example,
             // ora_platypus is the username and a12345678 is the password.
-            $db_conn = OCILogon("ora_seanquan", "a43496900", "dbhost.students.cs.ubc.ca:1522/stu");
+            $db_conn = OCILogon("ora_yuhei616", "a36561967", "dbhost.students.cs.ubc.ca:1522/stu");
 
 
             if ($db_conn) {
@@ -261,22 +261,36 @@
         function showInfo() {
             global $db_conn;
 
-            $tuple = array (
-                ":bind1" => $_GET['id']
-            );
+            if ($_GET['id'] == "") {
+                echo '<script>alert("ID Required!")</script>';
+                $success = False;
+            } else {
+                $result = executePlainSQL("SELECT * FROM Customer WHERE ID ='" . $_GET['id'] . "'");
+                $row = oci_fetch_row($result);
+                $rowExist = $row[0];
 
-            $alltuples = array (
-                $tuple
-            );
-
-			$result = executeBoundSQL("SELECT * FROM Customer WHERE ID=:bind1", $alltuples);
-
-            echo "<table>";
-            echo "<tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Birthday</th></tr>";
-            while ($row = OCI_Fetch_Array($result)) {
-                echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["NAME"] . "</td><td>" . $row["EMAIL"] . "</td><td>" . $row["PHONE"] . "</td><td>" . $row["DATEOFBIRTH"] . "</td></tr>";
+                if ($rowExist == "") {
+                    echo '<script>alert("ID is not valid!")</script>';
+                    $success = False;
+                } else {
+                    $tuple = array (
+                        ":bind1" => $_GET['id']
+                    );
+        
+                    $alltuples = array (
+                        $tuple
+                    );
+        
+                    $result = executeBoundSQL("SELECT * FROM Customer WHERE ID=:bind1", $alltuples);
+        
+                    echo "<table>";
+                    echo "<tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Birthday</th></tr>";
+                    while ($row = OCI_Fetch_Array($result)) {
+                        echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["NAME"] . "</td><td>" . $row["EMAIL"] . "</td><td>" . $row["PHONE"] . "</td><td>" . $row["DATEOFBIRTH"] . "</td></tr>";
+                    }
+                    echo "</table>";
+                }
             }
-            echo "</table>";
         }
 
         function handleUpdateRequest() {
@@ -290,23 +304,17 @@
 			if ($_POST['updateID'] == "") {
                 echo '<script>alert("Need ID to update!")</script>';
                 $success = False;
-            }
-            else {
+            } else {
                 //case where ID does not exist
                 $result = executePlainSQL("SELECT * FROM Customer WHERE ID ='" . $_POST['updateID'] . "'");
                 $row = oci_fetch_row($result);
                 $rowExist = $row[0];
-                
+
                 if ($rowExist == "") {
                     echo '<script>alert("ID is not valid!")</script>';
                     $success = False;
                 }
             }
-            
-
-
-
-
             if ($_POST['updateName'] == "") {
                 $result = executePlainSQL("SELECT name FROM Customer WHERE ID ='" . $_POST['updateID'] . "'");
                 $row = oci_fetch_row($result);
@@ -336,13 +344,12 @@
                 ":bind2" => $newName,
                 ":bind3" => $newEmail,
                 ":bind4" => $newPhone,
-                ":bind5" => $newDOB,
+                ":bind5" => $newDOB
             );
 
             $alltuples = array (
                 $tuple
             );
-
 
             if ($_POST['updateDOB'] == "") {
                 executeBoundSQL(
@@ -360,6 +367,7 @@
                     , $alltuples
                 );
             }
+
             OCICommit($db_conn);
         }
 
@@ -462,11 +470,11 @@
                 } 
 
                 if ($success) {
-                    echo '<script>alert("POST success")</script>';
+                    echo '<script>alert("Success")</script>';
                 }
-                else {
-                    echo '<script>alert("POST failed")</script>';
-                }
+                // else {
+                //     echo '<script>alert("Failed")</script>';
+                // }
 
                 disconnectFromDB();
             }
