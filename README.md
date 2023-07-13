@@ -11,4 +11,6 @@ at the concession stands, and can delete theaters. <br><br>
 All in all, this project touched on customer accounts, reviews for movies, tickets for movies,
 theaters and their movie rooms, the movies themselves, and concession stands.
 
+<a href="https://www.students.cs.ubc.ca/~yuhei616/project.php">Click here</a> to access the project.
+
 Tech Stack: PHP, Oracle Database, SQL
